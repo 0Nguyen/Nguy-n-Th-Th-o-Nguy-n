@@ -1,0 +1,22 @@
+Over-Ordering Sentinel
+Copyright (c) 2026 Nguyen Thi Thao Nguyen
+
+This project is created with the hope that data, public health, and technology can help protect patients, support fairer healthcare systems, and strengthen trust in universal health coverage.
+
+The source code of Over-Ordering Sentinel is made available for everyone to use, study, share, improve, and build upon for public-interest, educational, research, healthcare review, and social-good purposes.
+
+This project is especially intended to support students, public health workers, non-governmental organizations, medical review boards, audit teams, researchers, and healthcare oversight groups who want to examine unusual out-of-insurance ordering patterns among insured patients.
+
+The project is licensed under the GNU Affero General Public License, version 3 or later (AGPL-3.0-or-later).
+
+You may use, copy, modify, and redistribute this software under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version.
+
+This project is provided in the spirit of openness and public benefit. It is not intended to be used as an automatic accusation system, a commercial black-box doctor-scoring system, or a tool to punish healthcare workers without professional review.
+
+Over-Ordering Sentinel is a decision-support and review-support tool. It does not replace clinical judgment, medical ethics, legal review, insurance policy interpretation, or professional committee assessment.
+
+This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, or NON-INFRINGEMENT.
+
+A copy of the GNU Affero General Public License should be included with this project. If not, see:
+
+https://www.gnu.org/licenses/agpl-3.0.html
