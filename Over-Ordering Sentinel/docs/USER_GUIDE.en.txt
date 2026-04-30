@@ -1,0 +1,104 @@
+USER GUIDE
+
+DEFAULT LANGUAGE
+
+- The app opens in English by default.
+- You can still switch to Vietnamese from the sidebar.
+
+BEFORE YOU START
+
+- Install Python 3.10 or newer.
+- Make sure `python` is available in PATH.
+- Install dependencies with `pip install -r requirements.txt`.
+- If you want temporary public sharing, the machine also needs internet access.
+
+OFFLINE USE
+
+1. Double-click `START_OFFLINE.bat`.
+2. The app opens as a local-only Streamlit app.
+3. No admin console is shown.
+4. No public link is created.
+5. When the offline launcher owns the app process, closing the browser app window also stops that offline session.
+
+ONLINE SHARING
+
+1. Double-click `START_ONLINE.bat`.
+2. A local admin console opens on `http://127.0.0.1:8502`.
+3. Start the backend app if needed.
+4. Set or clear password if needed.
+5. Create a temporary public link.
+6. Share the link with the tester.
+
+CLOUDFLARED
+
+- The online launcher uses Cloudflare Quick Tunnel.
+- If `cloudflared` already exists in `tools/` or in PATH, the app uses it.
+- If it is missing, the app tries to install it automatically with `winget`.
+- If `winget` fails, the app downloads the official Windows AMD64 release and saves it to `tools/cloudflared.exe`.
+- If the machine has no internet access, offline mode still works, but online sharing will not.
+
+QUICK WORKFLOW
+
+1. Upload an Excel file.
+2. Let Smart Excel Mapper detect the data sheet and header row.
+3. Review the automatic column mapping.
+4. Keep auto mapping if it looks correct.
+5. Fix mapping manually only if needed.
+6. Confirm the mapping to run the analysis.
+7. Review the report and export the Excel result.
+
+PREPARE THE EXCEL FILE
+
+- Each row should ideally represent one order, service, medicine, or procedure.
+- Keep one clear header row when possible.
+- Avoid merged cells in the main data area if possible.
+- If the workbook has many sheets, keep one clean analysis sheet and separate README or guide sheets.
+- Use consistent insurance-status labels inside the same workbook when possible.
+
+SMART EXCEL MAPPER
+
+- The app can detect the data sheet automatically.
+- The app can detect the header row automatically.
+- The app can map columns automatically.
+- The app can let you adjust columns manually.
+- The app can normalize insurance-related values into the app's internal logic.
+
+MINIMUM COLUMNS
+
+- `DoctorName`
+- `PatientName`
+- `HasInsurance`
+- `CoveredByInsurance`
+
+AUTOMATIC NORMALIZATION
+
+- Auto mapping is best for already-clean workbooks.
+- If the normalized preview looks reasonable, you should usually keep the automatic mapping.
+- If one insurance-status column becomes entirely `unknown`, review the source mapping before analysis.
+
+MANUAL MAPPING AND MANUAL NORMALIZATION
+
+- Use manual mapping when the app chose the wrong column or missed a required column.
+- Use manual mapping when the hospital uses unusual headers or codes.
+- Fix `HasInsurance` and `CoveredByInsurance` first because they control the core review logic.
+- `HasInsurance` means whether the patient has insurance.
+- `CoveredByInsurance` means whether that specific order is covered by insurance.
+- These two meanings are different. An insured patient can still have out-of-insurance orders.
+
+HOW TO READ THE REPORT
+
+- `Overview` and the KPI cards show insured-data size, order count, out-of-insurance rate, and out-of-insurance amount.
+- `By doctor` compares doctors inside the same dataset.
+- `By department` compares departments or specialties.
+- `Doctor Red Flag Ranking` is a review-priority list, not a verdict.
+- `Suspicious High-Cost Procedure` highlights expensive services or procedures that need closer review.
+- `Required ICD Flags` highlights items that may need diagnosis or ICD context.
+- `False Red Flag Context` helps remove statistically suspicious cases that may be explainable.
+- `Case evidence` gives concrete row-level examples for deeper review.
+- `Tool status` shows which tools ran and whether any part lacked enough data.
+
+BUSINESS NOTES
+
+- The app analyzes insured-patient-related patterns only.
+- The app does not confirm fraud or wrongdoing.
+- The report uses review-oriented wording such as statistical abnormality and needs review.

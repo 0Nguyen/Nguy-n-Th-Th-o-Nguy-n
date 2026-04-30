@@ -1,0 +1,104 @@
+HUONG DAN SU DUNG
+
+NGON NGU MAC DINH
+
+- Ung dung mo mac dinh bang tieng Anh.
+- Ban van co the doi sang tieng Viet o sidebar.
+
+TRUOC KHI CHAY
+
+- Cai Python 3.10 tro len.
+- Dam bao `python` co trong PATH.
+- Cai dependencies bang `pip install -r requirements.txt`.
+- Neu muon dung che do chia se online tam thoi thi may can co internet.
+
+CHAY OFFLINE
+
+1. Bam dup `START_OFFLINE.bat`.
+2. Ung dung mo o che do local-only.
+3. Khong hien admin.
+4. Khong tao link public.
+5. Neu launcher offline la ben tu spawn app, dong cua so browser app se dong ca phien offline do.
+
+CHAY ONLINE
+
+1. Bam dup `START_ONLINE.bat`.
+2. Mo man hinh admin local tai `http://127.0.0.1:8502`.
+3. Neu can thi bat backend app.
+4. Dat hoac bo mat khau neu can.
+5. Tao link public tam thoi.
+6. Gui link cho nguoi test.
+
+CLOUDFLARED
+
+- Launcher online dung Cloudflare Quick Tunnel.
+- Neu may da co `cloudflared` trong `tools/` hoac trong PATH thi app dung luon.
+- Neu chua co, app se tu thu cai bang `winget`.
+- Neu `winget` that bai, app se tai ban Windows AMD64 chinh thuc va luu vao `tools/cloudflared.exe`.
+- Neu may khong co internet thi offline van chay, nhung online sharing se khong hoat dong.
+
+LUONG DUNG NHANH
+
+1. Upload file Excel.
+2. De Smart Excel Mapper tu tim sheet du lieu va header row.
+3. Kiem tra mapping cot tu dong.
+4. Neu auto mapping dung thi giu nguyen.
+5. Chi sua tay khi can.
+6. Xac nhan mapping de chay phan tich.
+7. Doc bao cao va tai Excel ket qua.
+
+CHUAN BI FILE EXCEL
+
+- Moi dong nen dai dien cho mot chi dinh, dich vu, thuoc hoac thu thuat.
+- Co gang de mot dong header ro rang.
+- Han che gop o trong vung du lieu chinh neu co the.
+- Neu workbook co nhieu sheet, nen tach rieng sheet README huong dan va giu mot sheet du lieu sach nhat de phan tich.
+- Neu duoc, hay ghi gia tri trang thai bao hiem nhat quan trong cung mot workbook.
+
+SMART EXCEL MAPPER
+
+- App co the tu nhan sheet du lieu.
+- App co the tu nhan header row.
+- App co the tu map cot.
+- App cho phep ban noi cot thu cong.
+- App co the chuan hoa cac gia tri lien quan den bao hiem ve logic chung cua he thong.
+
+CAC COT TOI THIEU
+
+- `DoctorName`
+- `PatientName`
+- `HasInsurance`
+- `CoveredByInsurance`
+
+CHUAN HOA TU DONG
+
+- Auto mapping hop voi workbook da kha sach.
+- Neu preview sau chuan hoa nhin hop ly, thuong nen giu mapping tu dong.
+- Neu mot cot trang thai bi toan `unknown`, hay kiem tra lai mapping truoc khi chay phan tich.
+
+NOI COT VA CHUAN HOA THU CONG
+
+- Dung manual mapping khi app chon nham cot hoac bo sot cot bat buoc.
+- Dung manual mapping khi benh vien dat ten cot la hoac ma hoa du lieu theo cach rieng.
+- Uu tien sua `HasInsurance` va `CoveredByInsurance` truoc vi day la logic cot loi.
+- `HasInsurance` la benh nhan co bao hiem hay khong.
+- `CoveredByInsurance` la chi dinh cu the do co duoc bao hiem chi tra hay khong.
+- Hai y nay khac nhau. Benh nhan co bao hiem van co the co chi dinh ngoai bao hiem.
+
+CACH DOC BAO CAO
+
+- `Overview` va cac the KPI cho biet quy mo du lieu insured, so chi dinh, ty le ngoai bao hiem va tong chi phi ngoai bao hiem.
+- `By doctor` dung de so sanh bac si trong cung tap du lieu.
+- `By department` dung de xem khoa phong nao co mat do hoac chi phi noi bat.
+- `Doctor Red Flag Ranking` la danh sach uu tien xem xet, khong phai ket luan sai pham.
+- `Suspicious High-Cost Procedure` tap trung vao dich vu hoac thu thuat chi phi cao can xem ky hon.
+- `Required ICD Flags` nhac cac truong hop can doi chieu them ICD hoac chan doan.
+- `False Red Flag Context` giup loai bot cac ca nhin do ve thong ke nhung co the giai thich duoc.
+- `Case evidence` dua ra vi du dong du lieu cu the de doc sau hon.
+- `Tool status` cho biet cong cu nao da chay va co phan nao thieu du lieu.
+
+GHI CHU NGHIEP VU
+
+- App phuc vu review thong ke lien quan den benh nhan co bao hiem.
+- App khong tu ket luan gian lan hay sai pham.
+- Bao cao dung ngon ngu theo huong can xem xet nhu bat thuong thong ke va can kiem tra.
