@@ -14,7 +14,7 @@ from scripts.share_tunnel import inspect_cloudflared_status, start_cloudflare_tu
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-BACKEND_URL = "http://127.0.0.1:8501"
+BACKEND_URL = "http://127.0.0.1:8503"
 ADMIN_URL = "http://127.0.0.1:8502"
 STREAMLIT_BACKEND_CMD = [
     sys.executable,
@@ -23,7 +23,7 @@ STREAMLIT_BACKEND_CMD = [
     "run",
     "app.py",
     "--server.address=127.0.0.1",
-    "--server.port=8501",
+    "--server.port=8503",
     "--server.headless=true",
 ]
 
@@ -291,7 +291,7 @@ def main() -> None:
     st.set_page_config(page_title="Over-Ordering Sentinel - Online Admin", layout="wide")
     st.title("🌐 Over-Ordering Sentinel - Online Admin")
     st.caption(
-        "App chính sẽ chạy ở backend tại http://127.0.0.1:8501. "
+        "App chính sẽ chạy ở backend tại http://127.0.0.1:8503. "
         "Public link sẽ trỏ vào app chính. Public user sẽ thấy giao diện app bình thường, không thấy admin."
     )
 

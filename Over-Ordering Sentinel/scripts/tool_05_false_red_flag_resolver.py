@@ -2,142 +2,255 @@ from __future__ import annotations
 
 import pandas as pd
 
-from scripts.text_utils import contains_any
+from scripts.analysis_support import get_context_frames
+from scripts.text_utils import contains_any, format_vnd
 
 
-CONTEXT_KEYWORDS = [
-    "mo",
-    "phau thuat",
-    "tien phau",
+STRONG_CONTEXT_KEYWORDS = [
+    "emergency",
+    "cấp cứu",
+    "cap cuu",
+    "inpatient",
+    "nội trú",
+    "noi tru",
+    "trauma",
+    "chấn thương",
+    "chan thuong",
+    "cancer",
+    "tumor",
+    "u",
+    "stroke",
+    "đột quỵ",
+    "dot quy",
+    "pregnancy",
+    "thai",
+    "icu",
+]
+
+WEAK_CONTEXT_KEYWORDS = [
+    "pre-op",
     "pre op",
+    "tiền phẫu",
+    "tien phau",
     "surgery",
     "operation",
-    "noi tru",
-    "cap cuu",
-    "emergency",
-    "inpatient",
+    "phẫu thuật",
+    "phau thuat",
 ]
 
 
-def _collect_flagged_groups(tool_results):
-    groups = []
-    for result in tool_results or []:
+def _context_status(text: str) -> tuple[str, str]:
+    if contains_any(text, STRONG_CONTEXT_KEYWORDS):
+        for keyword in STRONG_CONTEXT_KEYWORDS:
+            if contains_any(text, [keyword]):
+                return "STRONG_CONTEXT", keyword
+    if contains_any(text, WEAK_CONTEXT_KEYWORDS):
+        for keyword in WEAK_CONTEXT_KEYWORDS:
+            if contains_any(text, [keyword]):
+                return "WEAK_CONTEXT", keyword
+    return "NO_CONTEXT", ""
+
+
+def _resolution_status(context_status: str) -> str:
+    if context_status == "STRONG_CONTEXT":
+        return "RESOLVED_CONTEXT_PRESENT"
+    if context_status == "WEAK_CONTEXT":
+        return "PARTIALLY_RESOLVED_WEAK_CONTEXT"
+    return "NO_CONTEXT_FOUND"
+
+
+def _final_action(resolution_status: str) -> str:
+    if resolution_status == "RESOLVED_CONTEXT_PRESENT":
+        return "Keep this case in review because the context is clear."
+    if resolution_status == "PARTIALLY_RESOLVED_WEAK_CONTEXT":
+        return "Review cautiously; the context is only partially resolved."
+    return "Manual review is needed; no clear context was found."
+
+
+def _case_from_row(row, flag_source: str, flag_reason: str, flag_severity: str, source_claim_id: str = "") -> dict:
+    combined = " ".join(
+        [
+            str(row.get("procedure", "")),
+            str(row.get("diagnosis_name", "")),
+            str(row.get("diagnosis_code", "")),
+        ]
+    )
+    context_status, matched_keyword = _context_status(combined)
+    resolution_status = _resolution_status(context_status)
+    return {
+        "claim_id": row.get("claim_id", source_claim_id),
+        "patient": row.get("patient", ""),
+        "doctor": row.get("doctor", ""),
+        "department": row.get("department", ""),
+        "procedure": row.get("procedure", ""),
+        "diagnosis_code": row.get("diagnosis_code", ""),
+        "diagnosis_name": row.get("diagnosis_name", ""),
+        "amount_vnd": format_vnd(row.get("amount", row.get("amount_vnd", 0))),
+        "original_flag_source": flag_source,
+        "original_flag_reason": flag_reason,
+        "original_severity": flag_severity,
+        "matched_context_keyword": matched_keyword,
+        "context_status": context_status,
+        "resolution_status": resolution_status,
+        "final_review_action": _final_action(resolution_status),
+    }
+
+
+def _collect_case_rows(context, denominator_df: pd.DataFrame, numerator_df: pd.DataFrame) -> list[dict]:
+    rows: list[dict] = []
+    tool_results = getattr(context, "tool_results", []) or []
+    for result in tool_results:
         tables = result.get("tables", {}) or {}
+
+        icd_tables = [
+            ("required_icd_flags", "Tool 04"),
+            ("icd_mismatch_case_evidence", "Tool 04"),
+            ("case_evidence_table", "Tool 04"),
+        ]
+        for table_key, source_label in icd_tables:
+            table = tables.get(table_key)
+            if table is None or table.empty:
+                continue
+            for _, row in table.iterrows():
+                source_row = {
+                    "claim_id": row.get("claim_id", ""),
+                    "patient": row.get("patient", ""),
+                    "doctor": row.get("doctor", ""),
+                    "department": row.get("department", ""),
+                    "procedure": row.get("procedure", ""),
+                    "diagnosis_code": row.get("diagnosis_code", ""),
+                    "diagnosis_name": row.get("diagnosis_name", ""),
+                    "amount": row.get("amount_vnd", 0),
+                }
+                rows.append(_case_from_row(source_row, source_label, row.get("rule_name", row.get("mismatch_type", "ICD review")), row.get("severity", "")))
+
         doctor_table = tables.get("doctor_outlier_table")
-        if doctor_table is not None and not doctor_table.empty:
+        if doctor_table is not None and not doctor_table.empty and not numerator_df.empty:
             for _, row in doctor_table.iterrows():
-                if row.get("severity") in {"RED", "ORANGE", "YELLOW"}:
-                    groups.append(
-                        {
-                            "flag_type": "doctor_outlier",
-                            "doctor": row.get("ten_bac_si__doctor", ""),
-                            "department": row.get("khoa__department", ""),
-                            "procedure": "",
-                        }
+                doctor = str(row.get("ten_bac_si__doctor", row.get("doctor", "")))
+                department = str(row.get("department", row.get("khoa__department", "")))
+                subset = numerator_df.copy()
+                if doctor:
+                    subset = subset[subset["doctor"].astype(str) == doctor]
+                if department:
+                    subset = subset[subset["department"].astype(str) == department]
+                if subset.empty:
+                    subset = denominator_df.copy()
+                    if doctor:
+                        subset = subset[subset["doctor"].astype(str) == doctor]
+                    if department:
+                        subset = subset[subset["department"].astype(str) == department]
+                if subset.empty:
+                    continue
+                reason = row.get("review_priority", row.get("severity", "Doctor review"))
+                for _, source_row in subset.iterrows():
+                    rows.append(
+                        _case_from_row(
+                            source_row,
+                            "Tool 02",
+                            f"Doctor review priority: {reason}",
+                            row.get("severity", ""),
+                        )
                     )
+
         proc_table = tables.get("high_cost_procedure_table")
-        if proc_table is not None and not proc_table.empty:
+        if proc_table is not None and not proc_table.empty and not numerator_df.empty:
             for _, row in proc_table.iterrows():
-                if row.get("severity") in {"RED", "ORANGE", "YELLOW"} or row.get("high_cost") or row.get("flag_sensitive_procedure"):
-                    groups.append(
-                        {
-                            "flag_type": "high_cost_procedure",
-                            "doctor": row.get("ten_bac_si__doctor", ""),
-                            "department": row.get("khoa__department", ""),
-                            "procedure": row.get("ten_dich_vu__procedure", ""),
-                        }
+                doctor = str(row.get("doctor", ""))
+                department = str(row.get("department", ""))
+                procedure = str(row.get("procedure", ""))
+                subset = numerator_df.copy()
+                if doctor:
+                    subset = subset[subset["doctor"].astype(str) == doctor]
+                if department:
+                    subset = subset[subset["department"].astype(str) == department]
+                if procedure:
+                    subset = subset[subset["procedure"].astype(str) == procedure]
+                if subset.empty:
+                    continue
+                reason = row.get("review_reason", "Procedure review")
+                for _, source_row in subset.iterrows():
+                    rows.append(
+                        _case_from_row(
+                            source_row,
+                            "Tool 03",
+                            reason,
+                            row.get("severity", ""),
+                        )
                     )
-    return groups
+
+    return rows
 
 
 def run(df, context):
-    insured_df = df[df["has_insurance_status"] == "yes"].copy()
-    if insured_df.empty:
+    scope, denominator_df, numerator_df, reference_df = get_context_frames(df, context)
+    denominator_df = denominator_df if denominator_df is not None else pd.DataFrame()
+    numerator_df = numerator_df if numerator_df is not None else pd.DataFrame()
+
+    if denominator_df.empty and numerator_df.empty:
+        empty = pd.DataFrame()
         return {
-            "tool_name": "05 - Gỡ cờ đỏ sai / False red-flag resolver",
+            "tool_name": "05 - Context-based false flag review",
             "status": "completed",
-            "summary": {},
-            "tables": {"false_red_flag_context_table": pd.DataFrame()},
-            "notes": ["Không có bệnh nhân có bảo hiểm để phân tích / No insured patients to analyze."],
+            "summary": {"total_flags_reviewed": 0, "resolved_count": 0, "partially_resolved_count": 0, "unresolved_count": 0, "unresolved_rate": 0},
+            "tables": {
+                "false_red_flag_context_table": empty,
+                "case_context_resolution_table": empty,
+            },
+            "notes": ["No rows were available for context resolution."],
         }
 
-    flagged_groups = _collect_flagged_groups(getattr(context, "tool_results", []))
-    rows = []
-    seen = set()
-
-    for group in flagged_groups:
-        doctor = group["doctor"]
-        department = group["department"]
-        procedure = group["procedure"]
-
-        query = insured_df.copy()
-        if doctor:
-            query = query[query["doctor"] == doctor]
-        if department:
-            query = query[query["department"] == department]
-        if procedure:
-            query = query[query["procedure"] == procedure]
-
-        if query.empty:
-            context_status = "NO_CONTEXT_FOUND"
-            matched_keyword = ""
-            evidence_count = 0
-        else:
-            evidence_count = int(len(query))
-            matched_keyword = ""
-            context_status = "NO_CONTEXT_FOUND"
-            for _, row in query.iterrows():
-                combined = " ".join(
-                    [
-                        str(row.get("procedure", "")),
-                        str(row.get("diagnosis_name", "")),
-                        str(row.get("diagnosis_code", "")),
-                    ]
-                )
-                for keyword in CONTEXT_KEYWORDS:
-                    if contains_any(combined, [keyword]):
-                        context_status = "RESOLVED_CONTEXT_PRESENT"
-                        matched_keyword = keyword
-                        break
-                if context_status == "RESOLVED_CONTEXT_PRESENT":
-                    break
-
-        key = (group["flag_type"], doctor, department, procedure, context_status)
-        if key in seen:
-            continue
-        seen.add(key)
-        rows.append(
-            {
-                "flag_type": group["flag_type"],
-                "doctor": doctor,
-                "department": department,
-                "procedure": procedure,
-                "context_status": context_status,
-                "matched_keyword": matched_keyword,
-                "evidence_rows": evidence_count,
-            }
-        )
-
-    false_red_flag_context_table = pd.DataFrame(rows)
-    if false_red_flag_context_table.empty:
+    case_rows = _collect_case_rows(context, denominator_df, numerator_df)
+    case_context_resolution_table = pd.DataFrame(case_rows)
+    if case_context_resolution_table.empty:
+        empty = pd.DataFrame()
         return {
-            "tool_name": "05 - Gỡ cờ đỏ sai / False red-flag resolver",
+            "tool_name": "05 - Context-based false flag review",
             "status": "completed",
-            "summary": {},
-            "tables": {"false_red_flag_context_table": pd.DataFrame()},
+            "summary": {"total_flags_reviewed": 0, "resolved_count": 0, "partially_resolved_count": 0, "unresolved_count": 0, "unresolved_rate": 0},
+            "tables": {
+                "false_red_flag_context_table": empty,
+                "case_context_resolution_table": empty,
+            },
             "notes": [
-                "Chưa có cờ đỏ từ tool trước để đối chiếu context / No red flags from previous tools to resolve.",
-                "Tool 05 chỉ đánh dấu RESOLVED_CONTEXT_PRESENT khi tìm thấy context hợp lý trong chỉ định hoặc chẩn đoán / Tool 05 marks RESOLVED_CONTEXT_PRESENT only when it finds a plausible clinical context in the order or diagnosis.",
+                "No flagged cases were available from previous tools.",
+                "Tool 05 only classifies context; it does not remove or overwrite any flags.",
             ],
         }
 
+    false_red_flag_context_table = (
+        case_context_resolution_table.groupby(["original_flag_source", "doctor", "department", "procedure"], dropna=False)
+        .agg(
+            total_flags=("claim_id", "count"),
+            resolved_count=("resolution_status", lambda s: int((s == "RESOLVED_CONTEXT_PRESENT").sum())),
+            partially_resolved_count=("resolution_status", lambda s: int((s == "PARTIALLY_RESOLVED_WEAK_CONTEXT").sum())),
+            unresolved_count=("resolution_status", lambda s: int((s == "NO_CONTEXT_FOUND").sum())),
+        )
+        .reset_index()
+    )
+    false_red_flag_context_table["unresolved_rate"] = false_red_flag_context_table.apply(
+        lambda row: row["unresolved_count"] / row["total_flags"] if row["total_flags"] else 0,
+        axis=1,
+    )
+
+    summary = {
+        "total_flags_reviewed": int(len(case_context_resolution_table)),
+        "resolved_count": int((case_context_resolution_table["resolution_status"] == "RESOLVED_CONTEXT_PRESENT").sum()),
+        "partially_resolved_count": int((case_context_resolution_table["resolution_status"] == "PARTIALLY_RESOLVED_WEAK_CONTEXT").sum()),
+        "unresolved_count": int((case_context_resolution_table["resolution_status"] == "NO_CONTEXT_FOUND").sum()),
+        "unresolved_rate": float((case_context_resolution_table["resolution_status"] == "NO_CONTEXT_FOUND").mean()),
+    }
+
     return {
-        "tool_name": "05 - Gỡ cờ đỏ sai / False red-flag resolver",
+        "tool_name": "05 - Context-based false flag review",
         "status": "completed",
-        "summary": {"resolved_rows": int((false_red_flag_context_table["context_status"] == "RESOLVED_CONTEXT_PRESENT").sum())},
-        "tables": {"false_red_flag_context_table": false_red_flag_context_table},
+        "summary": summary,
+        "tables": {
+            "false_red_flag_context_table": false_red_flag_context_table,
+            "case_context_resolution_table": case_context_resolution_table,
+        },
         "notes": [
-            f"Đã đối chiếu {len(false_red_flag_context_table)} nhóm cờ đỏ với context lâm sàng / Matched {len(false_red_flag_context_table)} flagged groups against clinical context.",
-            "RESOLVED_CONTEXT_PRESENT = có context hợp lý; NO_CONTEXT_FOUND = cần hội đồng chuyên môn đánh giá thêm / RESOLVED_CONTEXT_PRESENT means plausible context exists; NO_CONTEXT_FOUND means further expert review is needed.",
+            "Tool 05 reclassifies flagged cases by context only; it does not delete or confirm any flag.",
+            "Strong context moves a case into review-support mode, weak context only partially opens it, and no context keeps it open for manual review.",
         ],
     }

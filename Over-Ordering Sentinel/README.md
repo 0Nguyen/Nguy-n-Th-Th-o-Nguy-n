@@ -1,13 +1,14 @@
 # Over-Ordering Sentinel
 
-Over-Ordering Sentinel is a Streamlit app for reviewing hospital Excel data with a focus on insured patients and out-of-insurance orders that need professional review.
+Over-Ordering Sentinel is a Streamlit app for reviewing hospital Excel data with a Review Measure Builder, evidence tables, and statistical review-support for selected cohorts.
 
 ## What the app does
 
 - Detects data sheets, header rows, and columns with Smart Excel Mapper.
-- Analyzes insured patients only.
+- Lets users build a review scope before analysis.
+- Defaults to insured patients + out-of-insurance orders.
 - Separates `HasInsurance` from `CoveredByInsurance`.
-- Flags statistical outliers and review-worthy patterns.
+- Produces denominator/numerator evidence tables, benchmarks, and case-level audit support.
 - Exports an Excel report for committee or reviewer follow-up.
 
 ## Default language
@@ -72,11 +73,12 @@ If the machine has no internet access, offline mode still works, but online shar
 ## Quick workflow
 
 1. Open the app.
-2. Upload an Excel file or use a sample file.
+2. Upload an Excel file.
 3. Let Smart Excel Mapper detect the data sheet, header row, and columns.
 4. Keep auto mapping if it is correct. Switch to manual mapping only if needed.
 5. Confirm the mapping.
-6. Review the report tables and export the Excel result.
+6. The Tools panel appears after you confirm mapping and start analysis.
+7. Review the report tables and export the Excel result.
 
 ## Prepare the Excel file
 
@@ -130,6 +132,13 @@ The two most important logic columns are:
 
 These are not interchangeable. An insured patient can still have out-of-insurance orders. If these two columns are mixed up, the whole analysis becomes misleading.
 
+Manual Excel standardization note:
+
+- update headers so the mapped columns match the real workbook meaning
+- normalize coded values before analysis when the hospital uses local labels
+- remove merged cells from the data region if possible
+- check the `Normalized data preview` before running analysis
+
 ## How to read the report
 
 ### KPI cards and overview
@@ -156,13 +165,9 @@ These are not interchangeable. An insured patient can still have out-of-insuranc
 
 - `HasInsurance` means whether the patient has insurance.
 - `CoveredByInsurance` means whether a specific order or procedure is covered.
+- A patient can have insurance while one specific order is still out of insurance.
 - The app does not make final fraud or wrongdoing conclusions.
-- The report uses review-oriented language such as statistical abnormality and needs review.
-
-## Sample data
-
-- `sample-data/sample_input.xlsx`
-- `sample-data/sample_input_multisheet.xlsx`
+- The report uses review-oriented language and should be treated as review-support only.
 
 ## Folder guide
 

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import atexit
 import os
 import subprocess
 import sys
@@ -87,11 +88,27 @@ def _terminate_process(proc: subprocess.Popen | None) -> None:
                     pass
 
 
+global_admin_proc: subprocess.Popen | None = None
+
+
+def _cleanup_on_exit() -> None:
+    """Cleanup handler called when launcher exits."""
+    global global_admin_proc
+    if global_admin_proc is not None:
+        _log("Cleaning up processes...")
+        _terminate_process(global_admin_proc)
+        time.sleep(1)  # Give processes time to clean up
+        _log("Cleanup complete.")
+
+
 def main() -> int:
+    global global_admin_proc
     admin_proc: subprocess.Popen | None = None
     try:
         _log("Starting Over-Ordering Sentinel online admin...")
         admin_proc = _start_admin()
+        global_admin_proc = admin_proc
+        atexit.register(_cleanup_on_exit)
         _wait_for_server(ADMIN_URL, timeout=60, proc=admin_proc)
         _open_browser(ADMIN_URL)
         _log("Admin console is running at http://127.0.0.1:8502")

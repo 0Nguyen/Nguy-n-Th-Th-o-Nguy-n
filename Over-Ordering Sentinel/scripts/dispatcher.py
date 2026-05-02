@@ -24,10 +24,10 @@ TOOL_ORDER = [
 ]
 
 
-def run_pipeline(df, selected_tools):
+def run_pipeline(df, selected_tools, analysis_scope=None):
     selected = list(selected_tools or TOOL_ORDER)
     selected_set = set(selected)
-    context = create_context(df=df, selected_tools=selected)
+    context = create_context(df=df, selected_tools=selected, analysis_scope=analysis_scope)
     results = []
     for tool_name in TOOL_ORDER:
         if tool_name not in selected_set:

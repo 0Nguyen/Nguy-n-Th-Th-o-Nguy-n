@@ -5,6 +5,8 @@ import unicodedata
 
 import pandas as pd
 
+from scripts.i18n import get_language
+
 
 COLUMN_ALIASES = {
     "doctor": [
@@ -52,7 +54,10 @@ COLUMN_ALIASES = {
     "diagnosis_name": ["Chẩn đoán / DiagnosisName", "DiagnosisName", "Chẩn đoán", "Diagnosis"],
 }
 
-REQUIRED = ["doctor", "patient", "has_insurance", "covered"]
+REQUIRED = ["doctor", "patient", "covered"]
+OPTIONAL_DEFAULTS = {
+    "has_insurance": "no",
+}
 
 CANONICAL_LABELS = {
     "doctor": "Tên bác sĩ / DoctorName",
@@ -108,12 +113,13 @@ NORMALIZED_ALIAS_TO_CANONICAL = _build_normalized_alias_map()
 
 
 def _make_default_series(series_length: int, canonical: str) -> pd.Series:
+    is_english = get_language() == "en"
     if canonical == "department":
-        return pd.Series(["Không rõ khoa / Unknown department"] * series_length)
+        return pd.Series((["Unknown department"] if is_english else ["Không rõ khoa / Unknown department"]) * series_length)
     if canonical == "amount":
         return pd.Series([0] * series_length)
     if canonical == "procedure":
-        return pd.Series(["Không rõ dịch vụ / Unknown procedure"] * series_length)
+        return pd.Series((["Unknown procedure"] if is_english else ["Không rõ dịch vụ / Unknown procedure"]) * series_length)
     if canonical == "claim_id":
         return pd.Series([f"ROW{i+1:06d}" for i in range(series_length)])
     if canonical in {"diagnosis_code", "diagnosis_name"}:
@@ -227,16 +233,30 @@ def _candidate_is_better(new_candidate, old_candidate) -> bool:
 
 
 def _friendly_required_message(canonical: str) -> str:
-    label = CANONICAL_LABELS.get(canonical, canonical)
+    is_english = get_language() == "en"
+    label = {
+        "doctor": "Doctor",
+        "patient": "Patient",
+        "has_insurance": "Has insurance",
+        "covered": "Covered by insurance",
+    }.get(canonical, canonical) if is_english else CANONICAL_LABELS.get(canonical, canonical)
     if canonical == "has_insurance":
-        return f"Thiếu cột bắt buộc: {label}. App cần biết bệnh nhân có bảo hiểm hay không."
+        return (
+            f"Missing required column: {label}. The app needs to know whether the patient has insurance."
+            if is_english
+            else f"Thiếu cột bắt buộc: {label}. App cần biết bệnh nhân có bảo hiểm hay không."
+        )
     if canonical == "covered":
-        return f"Thiếu cột bắt buộc: {label}. App cần biết từng chỉ định có được bảo hiểm chi trả hay không."
+        return (
+            f"Missing required column: {label}. The app needs to know whether each order is covered by insurance."
+            if is_english
+            else f"Thiếu cột bắt buộc: {label}. App cần biết từng chỉ định có được bảo hiểm chi trả hay không."
+        )
     if canonical == "doctor":
-        return f"Thiếu cột bắt buộc: {label}."
+        return f"Missing required column: {label}." if is_english else f"Thiếu cột bắt buộc: {label}."
     if canonical == "patient":
-        return f"Thiếu cột bắt buộc: {label}."
-    return f"Thiếu cột bắt buộc: {label}."
+        return f"Missing required column: {label}." if is_english else f"Thiếu cột bắt buộc: {label}."
+    return f"Missing required column: {label}." if is_english else f"Thiếu cột bắt buộc: {label}."
 
 
 def _build_mapping_report(raw_df: pd.DataFrame, resolved_columns: dict[str, dict], missing_required: list[str]) -> list[dict]:
@@ -357,11 +377,13 @@ def normalize_columns(raw_df: pd.DataFrame):
         )
 
     if "department" not in df.columns:
-        df["department"] = "Không rõ khoa / Unknown department"
+        df["department"] = "Unknown department" if get_language() == "en" else "Không rõ khoa / Unknown department"
     if "amount" not in df.columns:
         df["amount"] = 0
     if "procedure" not in df.columns:
-        df["procedure"] = "Không rõ dịch vụ / Unknown procedure"
+        df["procedure"] = "Unknown procedure" if get_language() == "en" else "Không rõ dịch vụ / Unknown procedure"
+    if "has_insurance" not in df.columns:
+        df["has_insurance"] = OPTIONAL_DEFAULTS["has_insurance"]
     if "claim_id" not in df.columns:
         df["claim_id"] = [f"ROW{i+1:06d}" for i in range(len(df))]
     if "diagnosis_code" not in df.columns:
@@ -379,10 +401,16 @@ def normalize_columns(raw_df: pd.DataFrame):
         "missing_required": [],
     }
     df.attrs["status_debug"] = {
+        "has_insurance_source_missing": resolved_columns.get("has_insurance", {}).get("source_column") is None,
         "has_insurance_raw_unique": df["has_insurance"].dropna().astype(str).unique().tolist()[:20],
         "has_insurance_status_counts": df["has_insurance_status"].value_counts(dropna=False).to_dict(),
         "covered_raw_unique": df["covered"].dropna().astype(str).unique().tolist()[:20],
         "covered_status_counts": df["covered_status"].value_counts(dropna=False).to_dict(),
+    }
+    df.attrs["analysis_assumptions"] = {
+        "has_insurance_defaulted_to_no": resolved_columns.get("has_insurance", {}).get("source_column") is None,
+        "has_insurance_assumed_value": "no" if resolved_columns.get("has_insurance", {}).get("source_column") is None else None,
+        "analysis_fallback_label": "uninsured_reference" if resolved_columns.get("has_insurance", {}).get("source_column") is None else None,
     }
     return df
 

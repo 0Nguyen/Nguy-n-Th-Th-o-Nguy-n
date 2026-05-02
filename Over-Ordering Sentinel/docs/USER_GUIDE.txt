@@ -3,63 +3,41 @@ USER GUIDE
 DEFAULT LANGUAGE
 
 - The app opens in English by default.
-- Vietnamese is still available from the sidebar language selector.
+- You can still switch to Vietnamese from the sidebar.
 
-QUICK START
+BEFORE YOU START
 
-1. Install Python 3.10 or newer.
-2. Make sure `python` is available in PATH.
-3. Install dependencies with `pip install -r requirements.txt`.
-4. Use `START_OFFLINE.bat` for local-only use.
-5. Use `START_ONLINE.bat` for local admin control and temporary public sharing.
+- Install Python 3.10 or newer.
+- Make sure `python` is available in PATH.
+- Install dependencies with `pip install -r requirements.txt`.
+- If you want temporary public sharing, the machine also needs internet access.
 
-OFFLINE MODE
+QUICK WORKFLOW
 
-- No admin console.
-- No public link.
-- No cloudflared required.
-- Best choice for one-computer review, internal review, or exam use.
-- If the offline launcher started the local app itself, closing the browser app window also closes that offline session.
+1. Upload an Excel file.
+2. Let Smart Excel Mapper detect the data sheet and header row.
+3. Review the automatic column mapping.
+4. Keep auto mapping if it looks correct.
+5. Fix mapping manually only if needed.
+6. Confirm the mapping.
+7. The Tools panel appears after you confirm mapping and start analysis.
+8. Review the report and export the Excel result.
 
-ONLINE MODE
+PREPARE THE EXCEL FILE
 
-- Opens the local admin console on `http://127.0.0.1:8502`.
-- Starts the backend app on `http://127.0.0.1:8501`.
-- Can create a temporary Cloudflare share link to the backend app.
-- The public user sees the normal app UI only, not the admin page.
-
-CLOUDFLARED
-
-- If `cloudflared.exe` exists in `tools/`, the app uses it.
-- If `cloudflared` exists in PATH, the app uses it.
-- If neither exists, the app tries to install it automatically with `winget`.
-- If `winget` fails, the app downloads the official Windows AMD64 release and stores it at `tools/cloudflared.exe`.
-
-EXCEL WORKFLOW
-
-1. Upload the Excel file.
-2. Let the app detect the best data sheet and header row.
-3. Review the detected columns.
-4. Keep automatic mapping if it looks correct.
-5. Fix the mapping manually only if needed.
-6. Confirm the mapping to run analysis.
-7. Review the report and export the result.
-
-PREPARE THE WORKBOOK
-
-- Try to keep one row per order or service.
+- Each row should ideally represent one order, service, medicine, or procedure.
 - Keep one clear header row when possible.
-- Avoid merged cells in the main data region when possible.
-- If the workbook contains guide sheets, keep them separate from the main analysis sheet.
-- Use consistent insurance-related labels inside the same file when possible.
+- Avoid merged cells in the main data area if possible.
+- If the workbook has many sheets, keep one clean analysis sheet and separate README or guide sheets.
+- Use consistent insurance-status labels inside the same workbook when possible.
 
 SMART EXCEL MAPPER
 
-- Detects the data sheet automatically.
-- Detects the header row automatically.
-- Maps columns automatically.
-- Allows manual column correction.
-- Normalizes insurance-related values into the app's logic.
+- The app can detect the data sheet automatically.
+- The app can detect the header row automatically.
+- The app can map columns automatically.
+- The app can let you adjust columns manually.
+- The app can normalize insurance-related values into the app's internal logic.
 
 MINIMUM COLUMNS
 
@@ -68,26 +46,36 @@ MINIMUM COLUMNS
 - `HasInsurance`
 - `CoveredByInsurance`
 
-CORE LOGIC
+AUTOMATIC NORMALIZATION
 
+- Auto mapping is best for already-clean workbooks.
+- If the normalized preview looks reasonable, you should usually keep the automatic mapping.
+- If one insurance-status column becomes entirely `unknown`, review the source mapping before analysis.
+
+MANUAL MAPPING AND MANUAL NORMALIZATION
+
+- Use manual mapping when the app chose the wrong column or missed a required column.
+- Use manual mapping when the hospital uses unusual headers or codes.
+- Fix `HasInsurance` and `CoveredByInsurance` first because they control the core review logic.
 - `HasInsurance` means whether the patient has insurance.
-- `CoveredByInsurance` means whether the specific order is covered by insurance.
-- These are different concepts.
-- An insured patient can still receive out-of-insurance orders.
+- `CoveredByInsurance` means whether that specific order is covered by insurance.
+- These two meanings are different. An insured patient can still have out-of-insurance orders.
+- Manual Excel standardization note: update headers, normalize coded values, remove merged cells from the data region, and check the `Normalized data preview` before running analysis.
 
-READING THE REPORT
+HOW TO READ THE REPORT
 
-- `Overview` and KPI cards describe the size and overall shape of the insured dataset.
-- `By doctor` compares doctors inside the same file.
+- `Overview` and the KPI cards show insured-data size, order count, out-of-insurance rate, and out-of-insurance amount.
+- `By doctor` compares doctors inside the same dataset.
 - `By department` compares departments or specialties.
-- `Doctor Red Flag Ranking` is a review-priority table, not a verdict.
-- `Suspicious High-Cost Procedure` focuses on expensive services or procedures.
-- `Required ICD Flags` focuses on diagnosis-context checks.
-- `False Red Flag Context` helps remove misleading red flags.
-- `Case evidence` shows concrete examples for deeper review.
-- `Tool status` explains which tools ran and what limitations they saw.
+- `Doctor Red Flag Ranking` is a review-priority list, not a verdict.
+- `Suspicious High-Cost Procedure` highlights expensive services or procedures that need closer review.
+- `Required ICD Flags` highlights items that may need diagnosis or ICD context.
+- `False Red Flag Context` helps remove statistically suspicious cases that may be explainable.
+- `Case evidence` gives concrete row-level examples for deeper review.
+- `Tool status` shows which tools ran and whether any part lacked enough data.
 
 BUSINESS NOTES
 
-- The app supports professional review, not automatic accusation.
-- The report uses review-oriented language such as statistical abnormality and needs review.
+- The app analyzes insured-patient-related patterns only.
+- The app does not confirm fraud or wrongdoing.
+- The report uses review-oriented wording such as statistical abnormality and needs review.

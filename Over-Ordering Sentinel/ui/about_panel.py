@@ -31,7 +31,7 @@ def render_about_panel() -> None:
 
     about_text = _read_about_text()
     if not about_text.strip():
-        st.warning("About file not found or could not be read.")
+        st.warning("Không tìm thấy hoặc không đọc được file giới thiệu.")
         return
 
     st.markdown(f"## {t('about_panel_title')}")

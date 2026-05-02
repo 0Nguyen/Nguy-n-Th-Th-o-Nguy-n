@@ -18,14 +18,14 @@ OFFLINE USE
 2. The app opens as a local-only Streamlit app.
 3. No admin console is shown.
 4. No public link is created.
-5. When the offline launcher owns the app process, closing the browser app window also stops that offline session.
+5. When the offline launcher owns the app process, closing the browser window also stops that offline session.
 
 ONLINE SHARING
 
 1. Double-click `START_ONLINE.bat`.
 2. A local admin console opens on `http://127.0.0.1:8502`.
 3. Start the backend app if needed.
-4. Set or clear password if needed.
+4. Set or clear the password if needed.
 5. Create a temporary public link.
 6. Share the link with the tester.
 
@@ -44,8 +44,9 @@ QUICK WORKFLOW
 3. Review the automatic column mapping.
 4. Keep auto mapping if it looks correct.
 5. Fix mapping manually only if needed.
-6. Confirm the mapping to run the analysis.
-7. Review the report and export the Excel result.
+6. Confirm the mapping.
+7. The Tools panel appears after you confirm mapping and start analysis.
+8. Review the report and export the Excel result.
 
 PREPARE THE EXCEL FILE
 
@@ -84,6 +85,7 @@ MANUAL MAPPING AND MANUAL NORMALIZATION
 - `HasInsurance` means whether the patient has insurance.
 - `CoveredByInsurance` means whether that specific order is covered by insurance.
 - These two meanings are different. An insured patient can still have out-of-insurance orders.
+- Manual Excel standardization note: update headers, normalize coded values, remove merged cells from the data region, and check the `Normalized data preview` before running analysis.
 
 HOW TO READ THE REPORT
 

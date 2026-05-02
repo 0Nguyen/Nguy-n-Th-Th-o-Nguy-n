@@ -19,12 +19,37 @@ from scripts.manual_mapping import (
 )
 from scripts.sheet_detector import detect_excel_sheets, find_best_data_sheet, is_description_sheet
 from scripts.value_mapper import apply_value_mapping, build_unique_value_options, coerce_status_choice, suggest_covered_value, suggest_has_insurance_value
-from scripts.i18n import t
+from scripts.i18n import get_language, t
 
 CANONICAL_LABELS = getattr(cm, "CANONICAL_LABELS", {})
 COLUMN_ALIASES = getattr(cm, "COLUMN_ALIASES", {})
 ColumnMappingError = getattr(cm, "ColumnMappingError")
 normalize_columns = getattr(cm, "normalize_columns")
+
+
+def _lang() -> str:
+    return get_language()
+
+
+def _u(vi: str, en: str) -> str:
+    return en if _lang() == "en" else vi
+
+
+def _canonical_label(canonical: str) -> str:
+    if _lang() == "en":
+        return {
+            "doctor": "Doctor",
+            "patient": "Patient",
+            "has_insurance": "Has insurance",
+            "covered": "Covered by insurance",
+            "department": "Department",
+            "amount": "Amount",
+            "procedure": "Procedure",
+            "claim_id": "Claim ID",
+            "diagnosis_code": "ICD code",
+            "diagnosis_name": "Diagnosis",
+        }.get(canonical, canonical)
+    return CANONICAL_LABELS.get(canonical, canonical)
 
 
 def _file_hash(file_bytes: bytes) -> str:
@@ -54,6 +79,7 @@ def _ensure_state(file_hash: str, best_sheet: str | None):
             "last_signature": "",
             "preset_loaded": False,
         }
+        st.session_state["analysis_tools_visible"] = False
     state = st.session_state[key]
     if best_sheet and not state.get("selected_sheet"):
         state["selected_sheet"] = best_sheet
@@ -116,7 +142,7 @@ def _preview_summary(df: pd.DataFrame) -> dict[str, object]:
 
 def _render_required_missing_warning(missing_required: list[str]) -> None:
     if missing_required:
-        labels = [CANONICAL_LABELS.get(col, col) for col in missing_required]
+        labels = [_canonical_label(col) for col in missing_required]
         st.warning(f"{t('smart_mapper_required_missing')} {', '.join(labels)}")
 
 
@@ -161,11 +187,11 @@ def _render_column_mapping_controls(file_hash: str, selected_sheet: str, raw_col
                 current_value = auto_mapping.get(canonical) or "<Missing>"
             index = options.index(current_value) if current_value in options else 0
             st.selectbox(
-                CANONICAL_LABELS.get(canonical, canonical),
+                _canonical_label(canonical),
                 options=options,
                 index=index,
                 key=widget_key,
-                help="Chọn cột nguồn tương ứng" if not manual_mode else None,
+                help=_u("Chọn cột nguồn tương ứng", "Select the matching source column.") if not manual_mode else None,
             )
         column_mapping = _current_column_mapping(file_hash, selected_sheet, raw_columns, auto_mapping)
     return column_mapping
@@ -176,7 +202,7 @@ def _render_value_mapping_controls(file_hash: str, selected_sheet: str, raw_df: 
     value_mapping = {"has_insurance": {}, "covered": {}}
     for kind in ("has_insurance", "covered"):
         source_column = column_mapping.get(kind)
-        st.write(f"**{CANONICAL_LABELS.get(kind, kind)}**")
+        st.write(f"**{_canonical_label(kind)}**")
         if not source_column or source_column not in raw_df.columns:
             st.caption("No source column selected.")
             continue
@@ -202,7 +228,7 @@ def _render_value_mapping_controls(file_hash: str, selected_sheet: str, raw_df: 
                 )
             value_mapping[kind][raw_value] = st.session_state.get(widget_key)
     if preset_loaded:
-        st.caption("Mapping preset đã được nạp / Mapping preset loaded.")
+        st.caption(_u("Preset ánh xạ đã được nạp.", "Mapping preset loaded."))
     return value_mapping
 
 
@@ -268,7 +294,7 @@ def render_smart_excel_mapper(uploaded_file):
                 [
                     {
                         "canonical": canonical,
-                        "label": CANONICAL_LABELS.get(canonical, canonical),
+                        "label": _canonical_label(canonical),
                         "auto_source_column": auto_mapping.get(canonical) or "<Missing>",
                         "required": canonical in {"doctor", "patient", "has_insurance", "covered"},
                     }
@@ -318,6 +344,12 @@ def render_smart_excel_mapper(uploaded_file):
             st.error(t("analysis_failed"))
 
     if normalized_df is not None:
+        assumptions = normalized_df.attrs.get("analysis_assumptions", {}) if hasattr(normalized_df, "attrs") else {}
+        if assumptions.get("has_insurance_defaulted_to_no"):
+            st.error(
+                "ASSUMPTION ACTIVE: No HasInsurance column was found. The app is defaulting all rows to uninsured "
+                "(HasInsurance = no) so analysis can continue. This is a fallback, not a conclusion about insurance status."
+            )
         summary = _preview_summary(normalized_df)
         c1, c2, c3, c4 = st.columns(4)
         c1.metric(t("smart_mapper_total_rows"), summary["total_rows"])
@@ -351,10 +383,12 @@ def render_smart_excel_mapper(uploaded_file):
     if state.get("last_signature") != mapping_signature:
         state["confirmed"] = False
         state["last_signature"] = mapping_signature
+        st.session_state["analysis_tools_visible"] = False
 
     if not missing_required and normalized_df is not None:
         if st.button(t("smart_mapper_confirm"), type="primary", use_container_width=True, key=_state_key(file_hash, f"{selected_sheet}_confirm")):
             state["confirmed"] = True
+            st.session_state["analysis_tools_visible"] = True
 
     if not state.get("confirmed"):
         if normalized_df is not None:

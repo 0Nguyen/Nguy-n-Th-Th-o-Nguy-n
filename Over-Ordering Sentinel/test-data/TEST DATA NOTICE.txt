@@ -1,0 +1,336 @@
+============================================================
+TEST DATA NOTICE / GHI CHÚ VỀ DỮ LIỆU TEST
+============================================================
+
+Project:
+Over-Ordering Sentinel MVP
+
+This project uses test/demo Excel files so judges can test the workflow of the app: upload Excel, map columns, analyze insured patients, detect unusual out-of-insurance ordering patterns, and export a review report.
+
+Dự án này sử dụng các file Excel test/demo để giám khảo kiểm tra quy trình của ứng dụng: tải Excel, nối cột dữ liệu, phân tích nhóm bệnh nhân có bảo hiểm, phát hiện mô hình chỉ định ngoài bảo hiểm bất thường và xuất báo cáo rà soát.
+
+------------------------------------------------------------
+1. Included test files / Các file test kèm theo
+------------------------------------------------------------
+
+Folder:
+test-data/
+
+Files:
+- Health Insurance Fraud Claims.xlsx
+- overordering_sentinel_large_source_based.xlsx
+
+The file "Health Insurance Fraud Claims.xlsx" is the original public-source dataset downloaded from Zenodo.
+
+The file "overordering_sentinel_large_source_based.xlsx" is a transformed demo dataset prepared for Over-Ordering Sentinel. It was adapted to match the app schema and to test the app workflow.
+
+------------------------------------------------------------
+2. Original data source / Nguồn dữ liệu gốc
+------------------------------------------------------------
+
+Original dataset name:
+Health Insurance Claims
+
+Original file:
+Health Insurance Fraud Claims.xlsx
+
+Source platform:
+Zenodo
+
+Record URL:
+https://zenodo.org/records/13289814
+
+Direct download URL:
+https://zenodo.org/records/13289814/files/Health%20Insurance%20Fraud%20Claims.xlsx?download=1
+
+DOI:
+10.5281/zenodo.13289814
+
+Author / Creator:
+Gideon, Gideon
+
+Publisher:
+Zenodo
+
+Resource type:
+Dataset
+
+Language:
+English
+
+Published on Zenodo:
+August 10, 2024
+
+File size:
+886.1 kB
+
+License:
+Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+Attribution:
+Gideon, Gideon. Health Insurance Claims. Zenodo. DOI: 10.5281/zenodo.13289814.
+
+------------------------------------------------------------
+3. Transformed demo data / Dữ liệu demo đã biến đổi
+------------------------------------------------------------
+
+Transformed file:
+overordering_sentinel_large_source_based.xlsx
+
+This transformed file was created for Over-Ordering Sentinel to test:
+
+- Excel upload;
+- Smart Excel Mapper;
+- HasInsurance / CoveredByInsurance separation;
+- insured-patient filtering;
+- out-of-insurance ordering analysis;
+- doctor outlier review;
+- high-cost procedure review;
+- ICD/context check;
+- false red-flag context review;
+- Excel report export.
+
+The transformed dataset may include changes such as:
+
+- renaming columns to match the app schema;
+- converting source fields into HasInsurance and CoveredByInsurance;
+- normalizing insurance and coverage values;
+- adapting department names;
+- adapting procedure names;
+- adapting claim/order costs;
+- adding or editing demo rows to test app behavior;
+- preparing the file for Excel upload and report export testing.
+
+The transformed dataset is for software demonstration and testing only.
+
+It is not intended to represent real clinical conclusions.
+
+------------------------------------------------------------
+4. Important business definitions / Định nghĩa nghiệp vụ quan trọng
+------------------------------------------------------------
+
+HasInsurance:
+Indicates whether the patient has insurance.
+
+CoveredByInsurance:
+Indicates whether a specific medical order, test, procedure, or service is covered by insurance.
+
+These two fields must not be confused.
+
+A patient may have insurance, but a specific order may still be outside insurance coverage.
+
+This distinction is the core logic of Over-Ordering Sentinel.
+
+HasInsurance:
+Cho biết bệnh nhân có bảo hiểm hay không.
+
+CoveredByInsurance:
+Cho biết từng chỉ định, xét nghiệm, thủ thuật hoặc dịch vụ có được bảo hiểm chi trả hay không.
+
+Hai trường này không được nhầm lẫn với nhau.
+
+Một bệnh nhân có thể có bảo hiểm, nhưng một chỉ định cụ thể vẫn có thể nằm ngoài phạm vi bảo hiểm chi trả.
+
+Đây là logic cốt lõi của Over-Ordering Sentinel.
+
+------------------------------------------------------------
+5. Privacy note / Ghi chú về quyền riêng tư
+------------------------------------------------------------
+
+This public repository must not contain real identifiable patient data.
+
+Do not upload real hospital data into this repository.
+
+Do not commit files containing:
+
+- real patient phone numbers;
+- real patient emails;
+- real addresses;
+- national ID numbers;
+- real insurance IDs;
+- real hospital medical record numbers;
+- direct personal identifiers;
+- confidential hospital records;
+- API keys;
+- passwords;
+- secrets.
+
+If real hospital data is used for private testing, it must remain outside the public repository.
+
+Repo công khai này không được chứa dữ liệu bệnh nhân có thể định danh.
+
+Không upload dữ liệu bệnh viện thật vào repo này.
+
+Không commit các file chứa:
+
+- số điện thoại thật của bệnh nhân;
+- email thật của bệnh nhân;
+- địa chỉ thật;
+- số định danh cá nhân;
+- mã bảo hiểm thật;
+- mã hồ sơ bệnh viện thật;
+- thông tin định danh trực tiếp;
+- hồ sơ bệnh viện bảo mật;
+- API key;
+- mật khẩu;
+- secret.
+
+Nếu dữ liệu bệnh viện thật được dùng để kiểm thử riêng tư, dữ liệu đó phải được giữ bên ngoài repo công khai.
+
+------------------------------------------------------------
+6. License and attribution / Giấy phép và ghi nguồn
+------------------------------------------------------------
+
+The original source dataset is publicly available on Zenodo.
+
+Original source dataset:
+Health Insurance Claims
+
+Original source file:
+Health Insurance Fraud Claims.xlsx
+
+Record URL:
+https://zenodo.org/records/13289814
+
+Direct download URL:
+https://zenodo.org/records/13289814/files/Health%20Insurance%20Fraud%20Claims.xlsx?download=1
+
+DOI:
+10.5281/zenodo.13289814
+
+Author / Creator:
+Gideon, Gideon
+
+Publisher:
+Zenodo
+
+License:
+Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+Attribution statement:
+This project uses a public dataset from Zenodo as a source/reference dataset.
+
+Citation:
+Gideon, Gideon. Health Insurance Claims. Zenodo. DOI: 10.5281/zenodo.13289814.
+
+The transformed demo dataset was adapted for Over-Ordering Sentinel to test Excel upload, column mapping, insured-patient filtering, out-of-insurance ordering analysis, and report export.
+
+The transformed demo data should be treated as demo/test data only.
+
+It must not be used to accuse any real doctor, hospital, patient, or organization.
+
+------------------------------------------------------------
+7. Responsible use / Sử dụng có trách nhiệm
+------------------------------------------------------------
+
+Over-Ordering Sentinel is a review-support tool.
+
+It does not automatically conclude fraud, wrongdoing, or professional misconduct.
+
+It only identifies unusual out-of-insurance ordering patterns that may deserve further review by a professional committee, audit team, NGO, or healthcare oversight group.
+
+Out-of-insurance orders are not automatically wrongdoing.
+
+Some out-of-insurance orders may be clinically reasonable.
+
+The app is designed to help reviewers ask better questions, not to replace human clinical judgment.
+
+Over-Ordering Sentinel là công cụ hỗ trợ rà soát.
+
+Ứng dụng không tự động kết luận gian lận, sai phạm hoặc lỗi chuyên môn.
+
+Ứng dụng chỉ phát hiện các mô hình chỉ định ngoài bảo hiểm bất thường để hội đồng chuyên môn, nhóm kiểm toán, tổ chức phi chính phủ hoặc đơn vị giám sát y tế xem xét thêm.
+
+Chỉ định ngoài bảo hiểm không tự động đồng nghĩa với sai phạm.
+
+Một số chỉ định ngoài bảo hiểm có thể hợp lý về mặt chuyên môn.
+
+Ứng dụng được thiết kế để giúp người rà soát đặt câu hỏi tốt hơn, không thay thế phán đoán lâm sàng của con người.
+
+------------------------------------------------------------
+8. Recommended interpretation / Cách diễn giải khuyến nghị
+------------------------------------------------------------
+
+Recommended wording:
+
+- statistical outlier;
+- unusual pattern;
+- needs review;
+- requires professional assessment;
+- out-of-insurance order;
+- review-support evidence.
+
+Avoid wording such as:
+
+- confirmed fraud;
+- confirmed violation;
+- doctor is wrong;
+- automatic misconduct;
+- proven abuse.
+
+Cách diễn giải nên dùng:
+
+- bất thường thống kê;
+- mô hình bất thường;
+- cần xem xét;
+- cần hội đồng chuyên môn đánh giá;
+- chỉ định ngoài bảo hiểm;
+- bằng chứng hỗ trợ rà soát.
+
+Cách diễn giải nên tránh:
+
+- gian lận chắc chắn;
+- sai phạm chắc chắn;
+- bác sĩ sai;
+- lỗi chuyên môn tự động;
+- lạm dụng đã được chứng minh.
+
+------------------------------------------------------------
+9. Project workflow tested by this data / Quy trình app được test bằng dữ liệu này
+------------------------------------------------------------
+
+The test data is used to verify that the app can:
+
+1. load Excel files;
+2. detect sheets and headers;
+3. map messy columns;
+4. normalize insurance and coverage fields;
+5. filter insured patients;
+6. analyze out-of-insurance orders;
+7. rank doctor-level unusual ordering patterns;
+8. review high-cost procedures;
+9. check ICD/context fields;
+10. export Excel reports.
+
+Dữ liệu test được dùng để kiểm tra rằng ứng dụng có thể:
+
+1. đọc file Excel;
+2. nhận diện sheet và dòng tiêu đề;
+3. nối cột dữ liệu chưa chuẩn;
+4. chuẩn hóa trường bảo hiểm và trạng thái chi trả;
+5. lọc nhóm bệnh nhân có bảo hiểm;
+6. phân tích các chỉ định ngoài bảo hiểm;
+7. xếp hạng mô hình chỉ định bất thường theo bác sĩ;
+8. rà soát dịch vụ chi phí cao;
+9. kiểm tra ICD/bối cảnh lâm sàng;
+10. xuất báo cáo Excel.
+
+------------------------------------------------------------
+10. Final note / Ghi chú cuối
+------------------------------------------------------------
+
+This test data notice is included so judges and reviewers can understand where the data came from, how it was transformed, and how the analysis should be interpreted.
+
+The goal of this project is transparency, review support, and protection of insured patients' financial rights.
+
+The goal is not automatic punishment.
+
+Ghi chú dữ liệu test này được cung cấp để giám khảo và người rà soát hiểu dữ liệu đến từ đâu, đã được biến đổi như thế nào và kết quả phân tích nên được diễn giải ra sao.
+
+Mục tiêu của dự án là minh bạch, hỗ trợ rà soát và bảo vệ quyền lợi tài chính của bệnh nhân có bảo hiểm.
+
+Mục tiêu không phải là tự động trừng phạt.
+
+============================================================
+END OF TEST DATA NOTICE
+============================================================

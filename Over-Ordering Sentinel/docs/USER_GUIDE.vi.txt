@@ -1,104 +1,106 @@
-HUONG DAN SU DUNG
+HƯỚNG DẪN SỬ DỤNG
 
-NGON NGU MAC DINH
+NGÔN NGỮ MẶC ĐỊNH
 
-- Ung dung mo mac dinh bang tieng Anh.
-- Ban van co the doi sang tieng Viet o sidebar.
+- Ứng dụng mở mặc định bằng tiếng Anh.
+- Bạn vẫn có thể đổi sang tiếng Việt ở sidebar.
 
-TRUOC KHI CHAY
+TRƯỚC KHI CHẠY
 
-- Cai Python 3.10 tro len.
-- Dam bao `python` co trong PATH.
-- Cai dependencies bang `pip install -r requirements.txt`.
-- Neu muon dung che do chia se online tam thoi thi may can co internet.
+- Cài Python 3.10 trở lên.
+- Đảm bảo `python` có trong PATH.
+- Cài dependencies bằng `pip install -r requirements.txt`.
+- Nếu muốn chia sẻ tạm thời qua internet thì máy cần có kết nối mạng.
 
-CHAY OFFLINE
+CHẠY OFFLINE
 
-1. Bam dup `START_OFFLINE.bat`.
-2. Ung dung mo o che do local-only.
-3. Khong hien admin.
-4. Khong tao link public.
-5. Neu launcher offline la ben tu spawn app, dong cua so browser app se dong ca phien offline do.
+1. Bấm đúp `START_OFFLINE.bat`.
+2. Ứng dụng mở ở chế độ local-only.
+3. Không hiện admin console.
+4. Không tạo link public.
+5. Khi launcher offline đang giữ tiến trình app, đóng cửa sổ trình duyệt cũng sẽ dừng phiên offline đó.
 
-CHAY ONLINE
+CHẠY ONLINE
 
-1. Bam dup `START_ONLINE.bat`.
-2. Mo man hinh admin local tai `http://127.0.0.1:8502`.
-3. Neu can thi bat backend app.
-4. Dat hoac bo mat khau neu can.
-5. Tao link public tam thoi.
-6. Gui link cho nguoi test.
+1. Bấm đúp `START_ONLINE.bat`.
+2. Màn hình admin local mở tại `http://127.0.0.1:8502`.
+3. Nếu cần thì bật backend app.
+4. Đặt hoặc bỏ mật khẩu nếu cần.
+5. Tạo link public tạm thời.
+6. Gửi link cho người test.
 
 CLOUDFLARED
 
-- Launcher online dung Cloudflare Quick Tunnel.
-- Neu may da co `cloudflared` trong `tools/` hoac trong PATH thi app dung luon.
-- Neu chua co, app se tu thu cai bang `winget`.
-- Neu `winget` that bai, app se tai ban Windows AMD64 chinh thuc va luu vao `tools/cloudflared.exe`.
-- Neu may khong co internet thi offline van chay, nhung online sharing se khong hoat dong.
+- Launcher online dùng Cloudflare Quick Tunnel.
+- Nếu máy đã có `cloudflared` trong `tools/` hoặc trong PATH thì app dùng luôn.
+- Nếu chưa có, app sẽ thử cài tự động bằng `winget`.
+- Nếu `winget` thất bại, app sẽ tải bản Windows AMD64 chính thức và lưu vào `tools/cloudflared.exe`.
+- Nếu máy không có internet thì offline vẫn chạy, nhưng online sharing sẽ không hoạt động.
 
-LUONG DUNG NHANH
+LUỒNG DÙNG NHANH
 
 1. Upload file Excel.
-2. De Smart Excel Mapper tu tim sheet du lieu va header row.
-3. Kiem tra mapping cot tu dong.
-4. Neu auto mapping dung thi giu nguyen.
-5. Chi sua tay khi can.
-6. Xac nhan mapping de chay phan tich.
-7. Doc bao cao va tai Excel ket qua.
+2. Để Smart Excel Mapper tự tìm sheet dữ liệu và header row.
+3. Kiểm tra mapping cột tự động.
+4. Nếu auto mapping đúng thì giữ nguyên.
+5. Chỉ sửa tay khi cần.
+6. Xác nhận mapping.
+7. Bộ công cụ sẽ hiện sau khi bạn xác nhận ánh xạ và bắt đầu phân tích.
+8. Đọc báo cáo và tải Excel kết quả.
 
-CHUAN BI FILE EXCEL
+CHUẨN BỊ FILE EXCEL
 
-- Moi dong nen dai dien cho mot chi dinh, dich vu, thuoc hoac thu thuat.
-- Co gang de mot dong header ro rang.
-- Han che gop o trong vung du lieu chinh neu co the.
-- Neu workbook co nhieu sheet, nen tach rieng sheet README huong dan va giu mot sheet du lieu sach nhat de phan tich.
-- Neu duoc, hay ghi gia tri trang thai bao hiem nhat quan trong cung mot workbook.
+- Mỗi dòng nên đại diện cho một chỉ định, dịch vụ, thuốc hoặc thủ thuật.
+- Cố gắng để một dòng header rõ ràng.
+- Hạn chế gộp ô trong vùng dữ liệu chính nếu có thể.
+- Nếu workbook có nhiều sheet, nên tách riêng sheet README hoặc hướng dẫn và giữ một sheet dữ liệu sạch nhất để phân tích.
+- Nên dùng nhãn trạng thái bảo hiểm nhất quán trong cùng một workbook.
 
 SMART EXCEL MAPPER
 
-- App co the tu nhan sheet du lieu.
-- App co the tu nhan header row.
-- App co the tu map cot.
-- App cho phep ban noi cot thu cong.
-- App co the chuan hoa cac gia tri lien quan den bao hiem ve logic chung cua he thong.
+- App có thể tự nhận sheet dữ liệu.
+- App có thể tự nhận header row.
+- App có thể tự map cột.
+- App cho phép bạn nối cột thủ công.
+- App có thể chuẩn hóa các giá trị liên quan đến bảo hiểm về logic chung của hệ thống.
 
-CAC COT TOI THIEU
+CÁC CỘT TỐI THIỂU
 
 - `DoctorName`
 - `PatientName`
 - `HasInsurance`
 - `CoveredByInsurance`
 
-CHUAN HOA TU DONG
+CHUẨN HÓA TỰ ĐỘNG
 
-- Auto mapping hop voi workbook da kha sach.
-- Neu preview sau chuan hoa nhin hop ly, thuong nen giu mapping tu dong.
-- Neu mot cot trang thai bi toan `unknown`, hay kiem tra lai mapping truoc khi chay phan tich.
+- Auto mapping hợp với workbook đã khá sạch.
+- Nếu preview sau chuẩn hóa nhìn hợp lý, thường nên giữ mapping tự động.
+- Nếu một cột trạng thái bị toàn `unknown`, hãy kiểm tra lại mapping trước khi chạy phân tích.
 
-NOI COT VA CHUAN HOA THU CONG
+NỐI CỘT VÀ CHUẨN HÓA THỦ CÔNG
 
-- Dung manual mapping khi app chon nham cot hoac bo sot cot bat buoc.
-- Dung manual mapping khi benh vien dat ten cot la hoac ma hoa du lieu theo cach rieng.
-- Uu tien sua `HasInsurance` va `CoveredByInsurance` truoc vi day la logic cot loi.
-- `HasInsurance` la benh nhan co bao hiem hay khong.
-- `CoveredByInsurance` la chi dinh cu the do co duoc bao hiem chi tra hay khong.
-- Hai y nay khac nhau. Benh nhan co bao hiem van co the co chi dinh ngoai bao hiem.
+- Dùng manual mapping khi app chọn nhầm cột hoặc bỏ sót cột bắt buộc.
+- Dùng manual mapping khi bệnh viện đặt tên cột lạ hoặc mã hóa dữ liệu theo cách riêng.
+- Ưu tiên sửa `HasInsurance` và `CoveredByInsurance` trước vì đây là logic cột lõi.
+- `HasInsurance` là bệnh nhân có bảo hiểm hay không.
+- `CoveredByInsurance` là chỉ định cụ thể đó có được bảo hiểm chi trả hay không.
+- Hai ý này khác nhau. Bệnh nhân có bảo hiểm vẫn có thể có chỉ định ngoài bảo hiểm.
+- Ghi chú chuẩn hóa dữ liệu Excel thủ công: hãy sửa header, đồng nhất mã giá trị, bỏ merged cells ở vùng dữ liệu, rồi kiểm tra `Normalized data preview` trước khi chạy phân tích.
 
-CACH DOC BAO CAO
+CÁCH ĐỌC BÁO CÁO
 
-- `Overview` va cac the KPI cho biet quy mo du lieu insured, so chi dinh, ty le ngoai bao hiem va tong chi phi ngoai bao hiem.
-- `By doctor` dung de so sanh bac si trong cung tap du lieu.
-- `By department` dung de xem khoa phong nao co mat do hoac chi phi noi bat.
-- `Doctor Red Flag Ranking` la danh sach uu tien xem xet, khong phai ket luan sai pham.
-- `Suspicious High-Cost Procedure` tap trung vao dich vu hoac thu thuat chi phi cao can xem ky hon.
-- `Required ICD Flags` nhac cac truong hop can doi chieu them ICD hoac chan doan.
-- `False Red Flag Context` giup loai bot cac ca nhin do ve thong ke nhung co the giai thich duoc.
-- `Case evidence` dua ra vi du dong du lieu cu the de doc sau hon.
-- `Tool status` cho biet cong cu nao da chay va co phan nao thieu du lieu.
+- `Overview` và các thẻ KPI cho biết quy mô dữ liệu insured, số chỉ định, tỷ lệ ngoài bảo hiểm và tổng chi phí ngoài bảo hiểm.
+- `By doctor` dùng để so sánh bác sĩ trong cùng tập dữ liệu.
+- `By department` dùng để xem khoa/phòng nào có mật độ hoặc chi phí nổi bật.
+- `Doctor Red Flag Ranking` là danh sách ưu tiên xem xét, không phải kết luận sai phạm.
+- `Suspicious High-Cost Procedure` tập trung vào dịch vụ hoặc thủ thuật chi phí cao cần xem kỹ hơn.
+- `Required ICD Flags` nhắc các trường hợp cần đối chiếu thêm ICD hoặc chẩn đoán.
+- `False Red Flag Context` giúp loại bớt các ca nhìn đỏ về thống kê nhưng có thể giải thích được.
+- `Case evidence` đưa ra ví dụ dòng dữ liệu cụ thể để đọc sâu hơn.
+- `Tool status` cho biết công cụ nào đã chạy và có phần nào thiếu dữ liệu.
 
-GHI CHU NGHIEP VU
+GHI CHÚ NGHIỆP VỤ
 
-- App phuc vu review thong ke lien quan den benh nhan co bao hiem.
-- App khong tu ket luan gian lan hay sai pham.
-- Bao cao dung ngon ngu theo huong can xem xet nhu bat thuong thong ke va can kiem tra.
+- App phục vụ review thống kê liên quan đến bệnh nhân có bảo hiểm.
+- App không tự kết luận gian lận hay sai phạm.
+- Báo cáo dùng ngôn ngữ theo hướng cần xem xét như bất thường thống kê và cần kiểm tra.
